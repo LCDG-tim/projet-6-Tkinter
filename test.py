@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jun 26 08:58:23 2020
+Created on Fri Jun 26 15:33:35 2020
 
 @author: timot
 """
 
 import matplotlib.pyplot as plt
 
-
-import tkinter
 import math
-
+import tkinter
 
 def graph(u_max: int, o: int):
     """fonction qui retourne le graphique
@@ -36,23 +34,19 @@ def graph(u_max: int, o: int):
     y = []
     for t in range(-20, 21):
         x.append(t)
-        y.append(u_max * math.sin(2 * math.pi * f * t + o))
+        y.append(u_max * math.sin(2 * math.pi * t + o))
     plt.plot(x, y, label="u=f(t)")
-    plt.xlim(-20, 20)
     plt.xlabel("temps (ms)")
     plt.ylabel("tension u (V)")
     plt.title("u = f(t)")
     plt.grid()
     plt.savefig("figure.png")
-    plt.close()
 
 
-def refreshaaaaa():
-    global scale_amplitude, scale_phase, img_cnv, caneva
-    graph(scale_amplitude.get(), scale_phase.get())
-    caneva.delete("all")
-    img_cnv = tkinter.PhotoImage(file="figure.png")
-    caneva.create_image(250, 200, image=img_cnv)
+def refresh(a):
+    global curseur_1, curseur_2, img
+    graph(curseur_1.get(), curseur_2.get())
+    img_cnv = tkinter.PhotoImage(file="figure.png").zoom(50).subsample(12)
 
 
 def quit_app():
@@ -62,59 +56,36 @@ def quit_app():
 
 # Définition de la fenêtre
 window = tkinter.Tk()
-window.geometry(
-    "500x500+{}+{}".format(
-        window.winfo_screenwidth()//3,
-        window.winfo_screenheight()//3
-    )
-)
+window.geometry("500x500+100+100")
 window.minsize(500, 500)
 window.maxsize(500, 500)
 window.title("Graphique")
+window.config(background="#333333")
 
 # frame principal
-master_frame = tkinter.Frame(window)
+master_frame = tkinter.Frame(window, bg="#777777")
 
 # =============================================================================
-# frame qui contient les curseur et bouton
-frame_2 = tkinter.Frame(master_frame)
+# Frame_2
+frame_2 = tkinter.Frame(master_frame, bg="red", width=500, height=500)
+texte = tkinter.Label(frame_2, text="texte")
+texte.pack(expand=tkinter.YES)
 
-# curseur phase
-scale_phase = tkinter.Scale(
+curseur_1 = tkinter.Scale(
+    frame_2,
+    from_=1,
+    to=10,
+    orient='horizontal',
+    label="curseur"
+)
+curseur_1.pack(expand=tkinter.YES)
+curseur_2 = tkinter.Scale(
     frame_2,
     from_=-2,
     to=2,
-    orient="horizontal",
-    label="Phase (rad)"
+    orient='horizontal',
+    label="curseur"
 )
-scale_phase.set(1)
-scale_phase.grid(row=0, column=1, sticky=tkinter.W)
-
-# curseur amplictude
-scale_amplitude = tkinter.Scale(
-    frame_2,
-    from_=0,
-    to=10,
-    orient="horizontal",
-    label="amplitude"
-
-)
-scale_amplitude.set(3)
-scale_amplitude.grid(row=0, column=2, sticky=tkinter.W)
-
-# bouton update
-update_button = tkinter.Button(
-    frame_2,
-    text="Update",
-    command=refreshaaaaa
-)
-update_button.grid(row=0, column=0, sticky= tkinter.W)
-quit_button = tkinter.Button(
-    frame_2,
-    text="quitter",
-    command=quit_app
-)
-quit_button.grid(row=0, column=3, sticky=tkinter.W)
 
 frame_2.grid(row=1, column=0, sticky=tkinter.W)
 # =============================================================================
@@ -122,13 +93,14 @@ frame_2.grid(row=1, column=0, sticky=tkinter.W)
 # =============================================================================
 # frame qui contient le graph
 
-frame_1 = tkinter.Frame(master_frame, width=500, height=400)
+frame_1 = tkinter.Frame(master_frame, bg="blue")
+img = tkinter.PhotoImage(file="figure.png")
+refresh(1)
 caneva = tkinter.Canvas(frame_1, width=500, height=400)
-refreshaaaaa()
-caneva.create_image(250, 250, image=img_cnv)
-caneva.pack()
+caneva.create_image(250, 200, image=img)
+caneva.pack(expand=tkinter.YES)
 
-frame_1.grid(row=0,column=0, sticky=tkinter.W, expand=tkinter.YES)
+frame_1.grid(row=0,column=0, sticky=tkinter.W)
 # =============================================================================
 # lancement de la fenêtre
 master_frame.pack()
